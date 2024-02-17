@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class TodoController {
     private TodoService todoService;
 
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TodoDTO> addTodo(@RequestBody @Valid TodoDTO t){
 
         TodoDTO todoDTO = todoService.addTodo(t);
@@ -27,6 +29,7 @@ public class TodoController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<List<TodoDTO>> getAllTodo(){
         List<TodoDTO> list = todoService.getAllTodo();
 
@@ -34,6 +37,7 @@ public class TodoController {
     }
 
     @GetMapping("/get")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<TodoDTO> getTodo(@RequestParam(name = "id") Long id){
 
         TodoDTO todoDTO = todoService.getTodo(id);
@@ -42,6 +46,7 @@ public class TodoController {
     }
 
     @PutMapping("/update")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TodoDTO> updateTodo(@RequestParam(name = "id") Long id,@RequestBody @Valid TodoDTO t){
 
         TodoDTO updateTodoDTO = todoService.updateTodo(id, t);
@@ -50,18 +55,21 @@ public class TodoController {
     }
 
     @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteTodo(@RequestParam(name = "id") Long id){
         todoService.deleteTodo(id);
         return new ResponseEntity<>("Deleted!", HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/completed")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<TodoDTO> completeTodo(@PathVariable("id") Long id){
         TodoDTO updatedTodo = todoService.completeTodo(id);
         return ResponseEntity.ok(updatedTodo);
     }
 
     @PatchMapping("/{id}/incomplete")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<TodoDTO> inCompleteTodo(@PathVariable("id") Long id){
         TodoDTO updatedTodo = todoService.inCompleteTodo(id);
         return ResponseEntity.ok(updatedTodo);
